@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 
 public class InMemoryAuctionService implements AuctionService{
 	private Auction[] items;

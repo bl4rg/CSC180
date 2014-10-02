@@ -53,7 +53,8 @@ public class Auction {
 		return "Id: " + this.id + 
 				"\nCurrent Bid: " + this.currentBid + 
 				"\nOwner: " + this.owner +
-				"\nName: " + this.name;
+				"\nName: " + this.name + 
+				"\n";
 		
 	}
 }
