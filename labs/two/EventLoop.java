@@ -4,24 +4,23 @@ import java.util.Queue;
 import java.util.Scanner;
 
 public class EventLoop {
+	private Scanner input = new Scanner(System.in);
+	private AuctionService as = new InMemoryAuctionService();
+	private final Event DEFAULT_STATE = new DefaultState(input, as);
+
 	private Queue<Event> toDo = new LinkedList<Event>();
 	private Queue<Event> done = new LinkedList<Event>();
 	
-	public EventLoop() {
-		begin();
-	}
-	
 	public void begin() {
-		AuctionService as = new InMemoryAuctionService();
-		Scanner scanner = new Scanner(System.in);
-		
 		while(true) {
-			done.add(new DefaultState(scanner, as));
+			done.add(DEFAULT_STATE);
 			while(!toDo.isEmpty()) {
 				Event event = (Event)toDo.poll();
 				event.show();
 				Event next = event.next();
-				done.offer(next);
+				if(next != null) {
+					done.offer(next);
+				}
 			}
 			Queue<Event> temp = toDo;
 			toDo = done;

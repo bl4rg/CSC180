@@ -2,10 +2,9 @@ package labs.two;
 import java.util.Scanner;
 
 public class DefaultState implements Event{
-	boolean quit = false;
-	private String userName = "";
 	private Scanner scanner;
 	private AuctionService as;
+
 	public DefaultState(Scanner scanner, AuctionService as) {
 		this.scanner = scanner;
 		this.as = as;
@@ -13,18 +12,17 @@ public class DefaultState implements Event{
 	
 	@Override
 	public void show() {
-		System.out.println("New user, would you like to log in? (Hit enter to decline)");
-		userName = scanner.nextLine();
-		if(userName.isEmpty()) {
-			quit = true;
-		}
+		System.out.println("\nNew user, would you like to log in? (Hit enter to decline)");
 	}
 
 	@Override
 	public Event next() {
-		Event temp = null;
-		if(!quit){
-			temp = new UserHomeState(userName, scanner, as);
+		Event temp;
+		String username = scanner.nextLine();
+		if(username == null || username.isEmpty()) {
+			temp = null;
+		}else {
+			temp = new UserHomeState(username, scanner, as);
 		}
 		return temp;
 	}
