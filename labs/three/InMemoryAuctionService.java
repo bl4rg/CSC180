@@ -1,16 +1,44 @@
 package labs.three;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class InMemoryAuctionService implements AuctionService{
 	private Map<Integer, Auction> items = new HashMap<>();
 	private int counter = 0;
+	private Matcher matcher;
+	private Pattern Auction_Item = Pattern.compile("<h3 class=\"lvtitle\"><a .*?(?:<span class=\"newly\">New listing</span>.*?)?(.*?)</a>.*?\\$([0-9,]+\\.\\d{2}).*?((\\d+) bid.*?)?(timeMs=\"(\\d+)\".*?)?Item: (\\d+)");
 	
-	public InMemoryAuctionService() {
-		create(new Auction(1, 0, "bowl", "plane"));
-		create(new Auction(2, 0, "plate", "fancy"));
-		create(new Auction(3, 0, "spoon", "dull"));
-		create(new Auction(4, 0, "fork", "shiny"));
+	public InMemoryAuctionService() {}
+
+	public InMemoryAuctionService(String file) {
+		Auction temp;
+		try {
+			Path path = Paths.get(file);
+			byte[] bytes = Files.readAllBytes(path);
+			String line = new String(bytes);
+			matcher = Auction_Item.matcher(line);
+		}catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		while(matcher.find()) {
+			String title = matcher.group(1).trim();
+			Integer price = Integer.parseInt(matcher.group(2).replace(",", " "));
+			int numberOfBids = Integer.parseInt(matcher.group(4));
+			long endTimeMillis = Long.parseLong(matcher.group(6));
+			Integer id = Integer.parseInt(matcher.group(7));
+
+			temp = new Auction(id, price, "", title, "", numberOfBids, endTimeMillis);
+			items.put(temp.getId(), temp);
+			if(temp.getId() > counter) {
+				counter = temp.getId() + 1;
+			}
+		}
 	}
 
 	@Override
@@ -67,26 +95,31 @@ public class InMemoryAuctionService implements AuctionService{
 
 	@Override
 	public Auction create(Auction auction) {
-		Auction a = new Auction(counter++, auction.getCurrentBid(), auction.getName(), auction.getDescription());
+		Auction a = new Auction(counter++, auction.getCurrentBid(), auction.getName(), auction.getDescription(), auction.getEndDate());
 		items.put(a.getId(), a);
 		return a;
 	}
 
 	@Override
 	public void delete(Integer id) {
-		// TODO Auto-generated method stub
-		
+		items.remove(id);
 	}
 
 	@Override
 	public Auction retreive(Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		Auction temp = items.get(id);
+		if(temp == null) {
+			throw new ObjectNotFoundException("Auction ID:" + id + " was not found");
+		}
+		return temp;
 	}
 
 	@Override
 	public Auction update(Auction auction, Integer id) {
-		// TODO Auto-generated method stub
-		return null;
+		if(!auction.getId().equals(id)) {
+			throw new IdMismatchException("Auction ID:" + auction.getId() + " does not match.");
+		}
+		items.put(id, auction);
+		return auction;
 	}
 }

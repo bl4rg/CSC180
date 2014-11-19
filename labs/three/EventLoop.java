@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class EventLoop {
 	private Scanner input = new Scanner(System.in);
-	private AuctionService as = new InMemoryAuctionService();
+	private AuctionService as = new InMemoryAuctionService("src.html");
 	private final Event DEFAULT_STATE = new DefaultState(input, as);
 
 	private Queue<Event> toDo = new LinkedList<Event>();
