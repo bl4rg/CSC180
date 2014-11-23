@@ -11,7 +11,6 @@ public class OrPredicate<T> implements Predicate<T> {
 
 	@Override
 	public boolean evaluate(T t) {
-		return one.evaluate(t) && two.evaluate(t);
-
+		return one.evaluate(t) || two.evaluate(t);
 	}
 }

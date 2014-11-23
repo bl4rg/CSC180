@@ -45,6 +45,7 @@ public class AuctionCreateState implements Event {
 		String inputDate = scanner.nextLine();
 		inputDate = (inputDate == null || inputDate.isEmpty()) ? defDate: inputDate;
 		matcher = Date_Pattern.matcher(inputDate);
+        matcher.find();
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, Integer.parseInt(matcher.group(3).length() == 2 ? "20" + matcher.group(3) : matcher.group(3)));
 		cal.set(Calendar.MONTH, Integer.parseInt(matcher.group(1)) - 1);
@@ -53,14 +54,15 @@ public class AuctionCreateState implements Event {
 		Auction auction = new Auction(0, startingBid, name, description, date);
 		auction = as.create(auction);
 
-		System.out.println(String.format("Item #%d (%s) created, would you like to create another. (Hit enter to decline)", auction.getId(), auction.getName()));
-		matcher = Yes_No.matcher(scanner.nextLine());
-
-		if ("Y".equalsIgnoreCase(matcher.group(1))) {
-			temp = this;
-		}else {
-			temp = new UserHomeState(username, scanner, as);
-		}
+//		System.out.println(String.format("Item #%d (%s) created, would you like to create another. (Hit enter to decline)", auction.getId(), auction.getName()));
+//        matcher = Yes_No.matcher(scanner.nextLine());
+//
+//        if ("Y".equalsIgnoreCase(matcher.group(1))) {
+//            temp = this;
+//        }else {
+//            temp = new UserHomeState(username, scanner, as);
+//		}
+        temp = new UserHomeState(username, scanner, as);
 		return temp;
 	}
 

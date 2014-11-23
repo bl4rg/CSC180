@@ -20,7 +20,7 @@ public class UserHomeState implements Event{
 		String print = "====================================" +
 				"\n======      Auction Home      ======" +
 				"\n====================================";
-
+        System.out.println(print);
 	}
 	
 	@Override
@@ -28,15 +28,16 @@ public class UserHomeState implements Event{
 		String input;
 		Event temp;
 		String print  = username + ", what would you like to do?"
-				+ "\nSearch for an item (type \"search\")"
-				+ "\nAdd a new item to the auction (type \"new\")";
+				+ "\n\tSearch for an item (type \"search\")"
+				+ "\n\tAdd a new item to the auction (type \"create\")";
 		System.out.println(print);
 		input = scanner.nextLine();
-		Matcher matcher = Commands.matcher(input);
+		Matcher match = Commands.matcher(input);
+        match.find();
 
-		if(matcher.group(1) == null || matcher.group(1).isEmpty()) {
+		if(match.group(1) == null || match.group(1).isEmpty()) {
 			temp = null;
-		}else if("C".equalsIgnoreCase(matcher.group(1))) {
+		}else if("C".equalsIgnoreCase(match.group(1))) {
 			temp = new AuctionCreateState(username, scanner, as);
 		}else {
 			temp = new AuctionSearchState(username, scanner, as);
