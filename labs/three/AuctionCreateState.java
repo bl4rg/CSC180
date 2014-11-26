@@ -22,8 +22,8 @@ public class AuctionCreateState implements Event {
 
 	public void show() {
 		String print = "==================================" +
-				"=======	Auction Create	=======" +
-				"==================================";
+				"\n=======	Auction Create	=======" +
+				"\n==================================";
 		System.out.println(print);
 	}
 

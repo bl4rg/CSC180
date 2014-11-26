@@ -22,7 +22,7 @@ public class TableRowAuctionConverter {
                 padder.pad("Bid", bidPad) +
                 padder.pad("Owner", ownerPad) +
                 padder.pad("Bids", bidsPad) +
-                padder.pad("Bids end", endsPad);
+                padder.pad("Bidding ends", endsPad);
         return output;
     }
 

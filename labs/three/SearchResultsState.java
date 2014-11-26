@@ -6,6 +6,7 @@ public class SearchResultsState implements Event{
 	private Scanner scanner;
 	private Auction[] results;
 	private AuctionService as;
+	TableRowAuctionConverter tableRow = new TableRowAuctionConverter();
 	
 	public SearchResultsState(String username, Auction[] results, Scanner scanner, AuctionService as) {
 		this.username = username;
@@ -16,17 +17,16 @@ public class SearchResultsState implements Event{
 
 	@Override
 	public void show() {
-		String print = "\n====================================" +
-				"=======	Search Results    =======" +
-				"====================================";
+		String print = "====================================" +
+				"\n=======	Search Results    =======" +
+				"\n====================================" +
+                "\n" + username + " here are your results\n";
 		System.out.println(print);
+		System.out.println(tableRow.header());
 		for(Auction item : results) {
-			System.out.println("   Id:\t" + item.getId() + 
-					"\n   Name:\t" + item.getName() +
-					"\n   Owner:\t" + item.getOwner() +
-					"\n   Current Bid: $" + item.getCurrentBid());
+			System.out.println(tableRow.format(item));
 		}
-		System.out.println("====================================\n");
+		System.out.println("\n====================================\n");
 		System.out.println("Enter the item id to increase the bid by $1. Otherwise, enter another\nsearch: (Hit enter to go back to home page)");
 
 	}

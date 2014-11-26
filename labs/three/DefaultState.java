@@ -12,7 +12,7 @@ public class DefaultState implements Event{
 	
 	@Override
 	public void show() {
-		System.out.println("\nNew user, would you like to log in? (Hit enter to decline)");
+		System.out.println("New user, would you like to log in? (Hit enter to decline)");
 	}
 
 	@Override
