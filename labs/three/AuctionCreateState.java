@@ -11,7 +11,7 @@ public class AuctionCreateState implements Event {
 	private Scanner scanner;
 	private AuctionService as;
 	private Pattern Yes_No = Pattern.compile("([YyNn])(es|o)?");
-	private Pattern Date_Pattern = Pattern.compile("(\\d{2})[\\.\\-/]?(\\d{2})[\\.\\-/]?(\\d{2,4})");
+	private Pattern Date_Pattern = Pattern.compile("(\\d{2})[\\.\\-/]?(\\d{2})[\\.\\-/]?(\\d{2,4})?");
 	private SimpleDateFormat Date_Format = new SimpleDateFormat("MM/dd/yyyy");
 	
 	public AuctionCreateState(String username, Scanner scanner, AuctionService as) {
@@ -22,48 +22,93 @@ public class AuctionCreateState implements Event {
 
 	public void show() {
 		String print = "==================================" +
-				"\n=======	Auction Create	=======" +
+				"\n=======	Auction Create	=========" +
 				"\n==================================";
 		System.out.println(print);
 	}
 
 	public Event next() {
-		Date date = new Date(System.currentTimeMillis());
 		Event temp = null;
-		Matcher matcher;
 
-		System.out.println("Please enter the name of the new item:");
-		String name = scanner.nextLine();
+		String name = promptForName(scanner);
 
-		System.out.println("Please enter a description of the item. (Hit enter to leave blank");
-		String description = scanner.nextLine();
+		String description = promptForDescription(scanner);
 
-		System.out.println("Please enter a starting price. (hit enter to leave it at $1)");
-		int startingBid = scanner.nextInt();
+		int startingBid = promptForStartingPrice(scanner);
 
-		String defDate = Date_Format.format(date);
-		String inputDate = scanner.nextLine();
-		inputDate = (inputDate == null || inputDate.isEmpty()) ? defDate: inputDate;
-		matcher = Date_Pattern.matcher(inputDate);
-        matcher.find();
+		Matcher matcher = matchDate();
+
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, Integer.parseInt(matcher.group(3).length() == 2 ? "20" + matcher.group(3) : matcher.group(3)));
 		cal.set(Calendar.MONTH, Integer.parseInt(matcher.group(1)) - 1);
 		cal.set(Calendar.DATE, Integer.parseInt(matcher.group(2)));
 
-		Auction auction = new Auction(0, startingBid, name, description, date);
+		Auction auction = new Auction(0, startingBid, name, description, cal.getTime());
 		auction = as.create(auction);
+		System.out.println(auction);
 
-//		System.out.println(String.format("Item #%d (%s) created, would you like to create another. (Hit enter to decline)", auction.getId(), auction.getName()));
-//        matcher = Yes_No.matcher(scanner.nextLine());
-//
-//        if ("Y".equalsIgnoreCase(matcher.group(1))) {
-//            temp = this;
-//        }else {
-//            temp = new UserHomeState(username, scanner, as);
-//		}
+        Matcher match = matchResponse(auction);
+
+        if ("Y".equalsIgnoreCase(match.group(1))) {
+            temp = this;
+        }else {
+            temp = new UserHomeState(username, scanner, as);
+		}
         temp = new UserHomeState(username, scanner, as);
 		return temp;
+	}
+
+	public Matcher matchDate() {
+		String inputDate = promptForDate(scanner);
+		Matcher match = Date_Pattern.matcher(inputDate);
+		match.matches();
+		return match;
+	}
+
+	public Matcher matchResponse(Auction auction) {
+		String input =  promptForNext(scanner, auction);
+		Matcher match = Yes_No.matcher(input);
+		match.matches();
+		return match;
+	}
+
+	private String promptForName(Scanner scanner) {
+		System.out.println(username + ", please enter the name of the new item:");
+		String inputName = scanner.nextLine();
+		String results = (inputName == null || inputName.isEmpty()) ? promptForName(scanner) : inputName;
+		return results;
+	}
+
+	private String promptForDescription(Scanner scanner) {
+		System.out.println("Please enter a description of the item. (Hit enter to leave blank)");
+		return scanner.nextLine();
+	}
+
+	private Integer promptForStartingPrice(Scanner scanner) {
+		int defPrice = 1;
+		System.out.println("Please enter a starting price. (hit enter to leave it at $1)");
+		int inputPrice = scanner.nextInt();
+		int price = (inputPrice != 0 || inputPrice != 1) ? inputPrice : defPrice;
+		return price;
+	}
+
+	private String promptForDate(Scanner scanner) {
+		String buffer = "-" +  scanner.nextLine();
+		Date date = new Date(System.currentTimeMillis());
+		String defDate = Date_Format.format(date);
+		System.out.println("Please enter a ending date for the item's bidding. (01/27/2014, 01/27, 01.27.2014, 01-27-2014)\n\tLeave empty for a default end date of a week from now.");
+		String inputDate = scanner.nextLine();
+		String results = (inputDate == null || inputDate.isEmpty()) ? defDate : inputDate;
+		System.out.println(results);
+		return results;
+	}
+
+	private String promptForNext(Scanner scanner, Auction auction) {
+		String ifEmpty = "no";
+		System.out.println(String.format("Item #%d [%s] created, would you like to create another. (Y/N, Hit enter to decline)", auction.getId(), auction.getName()));
+		String input = scanner.nextLine();
+		String results = (input == null || input.isEmpty()) ? ifEmpty : input;
+		return results;
 	}
 
 }

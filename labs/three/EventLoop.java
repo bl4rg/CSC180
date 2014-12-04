@@ -15,7 +15,7 @@ public class EventLoop {
 		while(true) {
 			done.add(DEFAULT_STATE);
 			while(!toDo.isEmpty()) {
-				Event event = (Event)toDo.poll();
+				Event event = toDo.poll();
 				event.show();
 				Event next = event.next();
 				if(next != null) {

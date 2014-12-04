@@ -5,21 +5,22 @@ import java.util.Date;
 public class Auction {
 	private Integer id;
 	private Integer currentBid;
+	private String creator;
 	private String owner;
 	private String name;
 	private String description;
 	private Integer numberOfBids;
 	private long endTimeMillis;
 
-	public Auction(Integer id, Integer bid, String name) {
-		this(new Integer(id), new Integer(bid), null, name, new Date());
+	public Auction(Integer id, Integer bid, String name, String username) {
+		this(new Integer(id), new Integer(bid), null, name, new Date(), username);
 	}
 
-	public Auction(Integer id, Integer bid, String name, String description, Date endsBy) {
-		this(id, bid, "", name, description, 0, endsBy.getTime());
+	public Auction(Integer id, Integer bid, String name, String description, Date endsBy, String username) {
+		this(id, bid, "", name, description, 0, endsBy.getTime(), username);
 	}
 
-	public Auction(Integer id, Integer currentBid, String owner, String name, String description, Integer numberOfBids, long endTimeMillis) {
+	public Auction(Integer id, Integer currentBid, String owner, String name, String description, Integer numberOfBids, long endTimeMillis, String creator) {
 		this.id = id;
 		this.currentBid = currentBid;
 		this.owner = owner;
@@ -27,6 +28,7 @@ public class Auction {
 		this.description = description;
 		this.numberOfBids = numberOfBids;
 		this.endTimeMillis = endTimeMillis;
+		this.creator = creator;
 	}
 
 	public Integer getId() {
@@ -74,7 +76,11 @@ public class Auction {
 	}
 
 	public Date getEndDate() {
-		return new Date(endTimeMillis);
+		return new Date(endTimeMillis + 7 * 24 * 60 * 60 * 1000);
+	}
+
+	public String getCreator() {
+		return creator;
 	}
 
 	@Override
@@ -102,6 +108,8 @@ public class Auction {
 				", owner='" + owner + '\'' +
 				", name='" + name + '\'' +
 				", description='" + description + '\'' +
+				", numberOfBids=" + numberOfBids +
+				", endDate=" + getEndDate() +
 				'}';
 	}
 }

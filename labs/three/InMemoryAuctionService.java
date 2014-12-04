@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class InMemoryAuctionService implements AuctionService{
 	private Map<Integer, Auction> items = new HashMap<>();
-	private int counter = 0;
+	private int counter = 1;
 	private Matcher matcher;
 	private Pattern Auction_Item = Pattern.compile("<h3 class=\"lvtitle\"><a .*?(?:<span class=\"newly\">New listing</span>.*?)?(.*?)</a>.*?\\$([0-9,]+\\.\\d{2}).*?((\\d+) bid.*?)?(timeMs=\"(\\d+)\".*?)?Item: (\\d+)");
 	
@@ -29,8 +29,10 @@ public class InMemoryAuctionService implements AuctionService{
 		while(matcher.find()) {
 			String title = matcher.group(1).trim();
 			Integer price = Integer.parseInt(matcher.group(2).replace(",", " "));
-			int numberOfBids = Integer.parseInt(matcher.group(4));
-			long endTimeMillis = Long.parseLong(matcher.group(6));
+			int bids = (matcher.group(4) == null || matcher.group(4).isEmpty()) ? 0 : Integer.parseInt(matcher.group(4));
+			int numberOfBids = bids;
+			long date = (matcher.group(6) == null || matcher.group(6).isEmpty()) ? System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000 : Long.parseLong(matcher.group(6));
+			long endTimeMillis = date;
 			Integer id = Integer.parseInt(matcher.group(7));
 
 			temp = new Auction(id, price, "", title, "", numberOfBids, endTimeMillis);
@@ -89,8 +91,11 @@ public class InMemoryAuctionService implements AuctionService{
 		if(username == null) {
 			throw new IllegalArgumentException("Must have an owner.");
 		}
-		temp.setOwner(username);
-		temp.setCurrentBid(temp.getCurrentBid() + 1);
+		if(temp != null && temp.getEndTimeMillis() < System.currentTimeMillis()) {
+			temp.setOwner(username);
+			temp.setCurrentBid(temp.getCurrentBid() + 1);
+			temp.setNumberOfBids(temp.getNumberOfBids() + 1);
+		}
 	}
 
 	@Override
@@ -115,10 +120,11 @@ public class InMemoryAuctionService implements AuctionService{
 	}
 
 	@Override
-	public Auction update(Auction auction, Integer id) {
+	public Auction update(Auction auction, Integer id, String username) {
 		if(!auction.getId().equals(id)) {
 			throw new IdMismatchException("Auction ID:" + auction.getId() + " does not match.");
 		}
+		if(!username.equals(auction.getCreator()))
 		items.put(id, auction);
 		return auction;
 	}

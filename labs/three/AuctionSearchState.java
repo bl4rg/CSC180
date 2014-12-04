@@ -22,8 +22,8 @@ public class AuctionSearchState implements Event{
     public void show() {
         String print = "====================================" +
                 "\n======     Auction Search     ======" +
-                "\n====================================" +
-                "\nWhat would you like to search for? (Hit enter to go back to the homepage)";
+                "\n====================================\n" +
+                username + ", what would you like to search for? (Hit enter to go back to the homepage)";
         System.out.println(print);
     }
 
