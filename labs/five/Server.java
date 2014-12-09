@@ -12,51 +12,49 @@ import java.util.regex.Pattern;
  * Created by sean on 12/7/2014.
  */
 public class Server {
-    ServerSocket server;
-    Socket client;
-    Scanner scanner;
-    AuctionService as;
-    Client passedClient;
+    private ServerSocket serverSocket;
+    private Socket socket = new Socket();
+    private Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        FileBasedDatasource fbd;
-        {
-            try {
-                fbd = new FileBasedDatasource("auction.dat");
-            } catch ( IOException e ) {
-                throw new IllegalStateException("Could not create needed datasource to run program: " + e);
-            }
+    FileBasedDatasource fbd;
+    {
+        try {
+            fbd = new FileBasedDatasource("auction.dat");
+        } catch ( IOException e ) {
+            throw new IllegalStateException("Could not create needed datasource to run program: " + e);
         }
-        Server server = new Server(new Scanner(System.in), new RemoteClientAuctionService(fbd), new Client());
-        server.connect();
     }
 
-    public Server(Scanner scanner, AuctionService as, Client passedClient){
-        this.scanner = scanner;
-        this.as = as;
+    private AuctionService as = new RemoteClientAuctionService(fbd);
+
+    private Client passedClient;
+    public Server() {}
+
+    public Server( Client passedClient){
         this.passedClient = passedClient;
-        try {
-            server = new ServerSocket(5000);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void connect() {
         try {
-            client = server.accept();
+            serverSocket = new ServerSocket(3000);
+            socket = serverSocket.accept();
+            // put code here that either writes out to client or waits for response from the client
+            socket.setKeepAlive(true);
+            sendReply(new Response(Protocol.SUCCESS));
         } catch (IOException e) {
             System.out.println("connection failed");
             e.printStackTrace();
         }
+
+        System.out.println(readRequest());
     }
 
     public void sendReply(Response response) {
         ObjectOutputStream writer = null;
         try {
-            writer = new ObjectOutputStream(client.getOutputStream());
+            writer = new ObjectOutputStream(socket.getOutputStream());
             writer.writeObject(response);
-            writer.close();
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,14 +64,14 @@ public class Server {
         ObjectInputStream reader = null;
         Request request = null;
         try {
-            reader = new ObjectInputStream(client.getInputStream());
+            reader = new ObjectInputStream(socket.getInputStream());
             request = (Request) reader.readObject();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return request;
+            return request;
     }
 
     public State extractRequest(String...command) {
@@ -122,5 +120,10 @@ public class Server {
         }
 
         return temp;
+    }
+
+    public static void main(String[] args) {
+        Server server = new Server(new Client());
+        server.connect();
     }
 }

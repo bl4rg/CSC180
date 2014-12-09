@@ -18,14 +18,18 @@ public class EventLoop {
 	}
 	
 	private final AuctionService as = new RemoteClientAuctionService(fbd);
-	private Client client;
-	private Server server = new Server(input, as, client);
-	private final State DEFAULT_STATE = new DefaultState(input, as, server);
 	
 	private Queue<State> activeQueue = new LinkedList<State>();
 	private Queue<State> expiredQueue = new LinkedList<State>();
 
-	public EventLoop() {}
+	private Server server = new Server();
+	private Client passedClient;
+
+	public EventLoop(Client passedClient) {
+		this.passedClient = passedClient;
+	}
+
+	private final State DEFAULT_STATE = new DefaultState(input, as, server, passedClient);
 
 	public void begin() {
 		while ( true ) {

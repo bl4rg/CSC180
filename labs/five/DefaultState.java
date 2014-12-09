@@ -6,13 +6,14 @@ import java.util.Scanner;
 public class DefaultState implements State {
 	private Scanner scanner;
 	private AuctionService as;
-	private Client client = new Client();
+	private Client client;
 	private Server server;
 	
-	public DefaultState(Scanner scanner, AuctionService as, Server server) {
+	public DefaultState(Scanner scanner, AuctionService as, Server server, Client passedClient) {
 		this.scanner = scanner;
 		this.as = as;
 		this.server = server;
+		this.client = passedClient;
 	}
 
 	@Override
@@ -25,7 +26,7 @@ public class DefaultState implements State {
 		String username = scanner.nextLine();
 		if ( username == null || username.length() == 0 ) {
 			return null;
-		} else {
+		}else {
 			client.sendRequest(new Request("userhome",username, ""));
 		}
 
