@@ -9,10 +9,10 @@ import java.net.Socket;
 public class Client {
     private Socket client;
 
-    public static void main(String[] args) {
-        Client client = new Client();
-        client.connect();
-    }
+//    public static void main(String[] args) {
+//        Client client = new Client();
+//        client.connect();
+//    }
 
     public Client() {
     }

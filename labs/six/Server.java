@@ -18,18 +18,18 @@ public class Server {
     AuctionService as;
     Client passedClient;
 
-    public static void main(String[] args) {
-        FileBasedDatasource fbd;
-        {
-            try {
-                fbd = new FileBasedDatasource("auction.dat");
-            } catch ( IOException e ) {
-                throw new IllegalStateException("Could not create needed datasource to run program: " + e);
-            }
-        }
-        Server server = new Server(new Scanner(System.in), new RemoteClientAuctionService(fbd), new Client());
-        server.connect();
-    }
+//    public static void main(String[] args) {
+//        FileBasedDatasource fbd;
+//        {
+//            try {
+//                fbd = new FileBasedDatasource("auction.dat");
+//            } catch ( IOException e ) {
+//                throw new IllegalStateException("Could not create needed datasource to run program: " + e);
+//            }
+//        }
+//        Server server = new Server(new Scanner(System.in), new RemoteClientAuctionService(fbd), new Client());
+//        server.connect();
+//    }
 
     public Server(Scanner scanner, AuctionService as, Client passedClient){
         this.scanner = scanner;
@@ -87,32 +87,32 @@ public class Server {
 
         if(match.group(1).toLowerCase().startsWith("s")) {
             if(parameters == null || parameters.isEmpty()) {
-                temp = new AuctionSearchState(parameters, scanner, as, passedClient, this);
+                temp = new AuctionSearchState(parameters, scanner, as);
             }else {
                 String[] brokenDown = parameters.split(",");
                 Auction[] results = as.search(brokenDown[1]);
-                temp = new SearchResultState(parameters, brokenDown[0], results, scanner, as, passedClient, this);
+                temp = new SearchResultState(parameters, brokenDown[0], results, scanner, as);
             }
         }else if(match.group(1).toLowerCase().startsWith("c")){
             if(body == null || body.isEmpty()) {
-                temp = new AuctionCreateState(parameters, scanner, as, passedClient, this);
+                temp = new AuctionCreateState(parameters, scanner, as);
             }else {
                 String[] properties = body.split(",");
                 Auction a = new Auction(Long.parseLong(properties[0]), properties[1], properties[2], Double.parseDouble(properties[3]), properties[4], Integer.parseInt(properties[5]), Long.parseLong(properties[6]));
                 as.create(a);
             }
         }else if(match.group(1).toLowerCase().startsWith("u")){
-            temp = new UserHomeState(parameters, scanner, as, passedClient, this);
+            temp = new UserHomeState(parameters, scanner, as);
         }else if(match.group(1).toLowerCase().startsWith("l")){
             if(match.group(1).toLowerCase().endsWith("login")) {
-                temp = new UserHomeState(parameters, scanner, as, passedClient, this);
+                temp = new UserHomeState(parameters, scanner, as);
             }else if(match.group(1).toLowerCase().endsWith("login")) {
                 temp = null;
             }
         }else if(match.group(1).toLowerCase().startsWith("b")){
             String[] brokenDown = parameters.split(",");
             as.bid(parameters, Long.parseLong(brokenDown[0]));
-            temp = new SearchResultState(brokenDown[1], brokenDown[2], as.search(brokenDown[2]), scanner, as, passedClient, this);
+            temp = new SearchResultState(brokenDown[1], brokenDown[2], as.search(brokenDown[2]), scanner, as);
         }else if(match.group(1).toLowerCase().startsWith("e")){
 
         }else if(match.group(1).toLowerCase().startsWith("d")){

@@ -12,7 +12,7 @@ public class GUI {
     private JFrame frame = new JFrame();
     private JPanel controls = new JPanel();
     private JPanel content = new JPanel();
-    private JPanel mainPanel = new JPanel();
+    private JPanel auction = new JPanel();
     private JPanel loginPanel = new JPanel();
     private CardLayout cardLayout = new CardLayout();
 
@@ -25,41 +25,38 @@ public class GUI {
         controls.add(searchField);
         controls.add(searchButton);
 
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(controls, BorderLayout.NORTH);
-        mainPanel.add(content, BorderLayout.SOUTH);
+        auction.setLayout(new BorderLayout());
+        auction.add(controls, BorderLayout.NORTH);
+        auction.add(content, BorderLayout.SOUTH);
 
         JPanel contents = new JPanel();
         JTextField field = new JTextField(25);
         JButton loginButton = new JButton("Login");
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(field.getText() == null || field.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "field is empty");
-                }else {
-                    hideLogin();
-                }
+        loginButton.addActionListener(e -> {
+            if(field.getText() == null || field.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "field is empty");
+            }else {
+                hideLogin();
             }
         });
         contents.add(field);
         contents.add(loginButton);
         loginPanel.setLayout(new BorderLayout());
-        loginPanel.add(field, BorderLayout.NORTH);
+        loginPanel.add(field, BorderLayout.CENTER);
         loginPanel.add(loginButton, BorderLayout.SOUTH);
 
         frame.setLayout(cardLayout);
         frame.add(loginPanel, "login");
-        frame.add(mainPanel, "main");
-        cardLayout.first(frame);
+        frame.add(auction, "main");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(new Dimension(800, 600));
         frame.pack();
+        frame.setSize(new Dimension(800, 600));
         frame.setVisible(true);
+        cardLayout.first(loginPanel);
     }
 
     public void hideLogin() {
-        cardLayout.next(frame);
+        cardLayout.next(auction);
     }
 
     public void addToControls(JComponent component) {
